@@ -34,7 +34,7 @@
                                 <!-- <button class="btn btn-danger" type="button">-</button> -->
                             </span>
                         {% else %}
-                            <input id= "{{ label.id }}" onkeydown="if (event.keyCode == 13) { label(this.id, this.value); }" type="text" class="form-control" placeholder="label name" ></input>
+                            <input id= "{{ label.id }}" onkeydown="if (event.keyCode == 13) { label(this.id, this.value); }" type="text" class="form-control" placeholder="label name" autofocus></input>
                         {% endif %}
                         <span class="input-group-btn">
                             <button id= "{{ label.id }}" class="btn btn-danger" onclick="window.location.replace('/remove/' + this.id)" type="button">-</button> if (event.keyCode == 13) { label(this.id, this.value); }
@@ -66,20 +66,21 @@
     {% endif %}
     </div>
     <div style="overflow: scroll">
-        <canvas id="canvas" style="width:100%; height:80%; margin: 0; padding: 0;"></canvas>
+        <canvas id="canvas" style="width:30%; height:30%; margin: 0; padding: 0;"></canvas>
     </div>
     <!-- <a href="/next" class="btn btn-primary" style="float:left;" type="button">
       <span class="glyphicon glyphicon-arrow-left"></span>
     </a> -->
     <script>
       var labels = {{ labels|tojson|safe }};
+      var allHaveName = labels.every(function(item){return item.name != ""});
       var c = document.getElementById("canvas");
       var ctx = c.getContext("2d");
       var drawLabels = function(id, xMin, xMax, yMin, yMax) {
-        ctx.strokeStyle = "pink";
-        ctx.fillStyle = "pink";
+        ctx.strokeStyle = "red";
+        ctx.fillStyle = "red";
         ctx.rect(xMin, yMin, xMax - xMin, yMax - yMin);
-        ctx.lineWidth="3";
+        ctx.lineWidth="1";
         ctx.stroke();
         ctx.font = "10px Arial";
         ctx.fillText("id: " + id, xMin,yMin);
@@ -108,10 +109,10 @@
             var x = (image.width / c.scrollWidth) * e.offsetX;
             var y = (image.height / c.scrollHeight) * e.offsetY;
             console.log(e);
-            ctx.strokeStyle = "pink";
-            ctx.fillStyle = "pink";
+            ctx.strokeStyle = "red";
+            ctx.fillStyle = "red";
             ctx.beginPath();
-            ctx.arc(x, y, 3, 0, 2*Math.PI, false);
+            ctx.arc(x, y, 1, 0, 2*Math.PI, false);
             ctx.fill();
             fPoint = {
               x: x,
@@ -138,24 +139,38 @@
               yMax = fPoint.y;
               yMin = y;
             }
-            fPoint = {};
+        fPoint = {};
             window.location.replace("/add/" + (labels.length + 1) +
             "?xMin=" + xMin +
             "&xMax=" + xMax +
             "&yMin=" + yMin +
-            "&yMax=" + yMax);
+        "&yMax=" + yMax);
+            <!-- document.getElementById((labels.length+1).toString()).focus(); -->
         }
         clicked = !clicked;
       };
 
-      // document.onkeydown = function(e) {
-      //   if ("key" in e) {
-      //     if(e.key == "Escape" || e.key == "Esc") {
-      //       clicked = false;
-      //       fPoint = {};
-      //     }
-      //   }
-      // };
+       <!-- document.onkeydown = function(e) { -->
+       <!--   if ("key" in e) { -->
+       <!--     if(e.key == "Escape" || e.key == "Esc") { -->
+       <!--       clicked = false; -->
+       <!--       fPoint = {}; -->
+       <!--     } -->
+       <!--  } -->
+       <!--  if (e.which==13||e.keyCode==13){ -->
+        
+       <!--  } -->
+       <!-- }; -->
+
+       document.onkeydown = function(e) {
+       if (e.which==32||e.keyCode==32){
+       if(allHaveName){
+       window.location.replace("/next");
+       }
+       }
+       }
+
+     
     </script>
 </div>
 </body>

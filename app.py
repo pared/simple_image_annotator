@@ -12,6 +12,7 @@ from flask import send_file
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+
 @app.route('/tagger')
 def tagger():
     if (app.config["HEAD"] == len(app.config["FILES"])):
@@ -23,25 +24,28 @@ def tagger():
     print(not_end)
     return render_template('tagger.html', not_end=not_end, directory=directory, image=image, labels=labels, head=app.config["HEAD"] + 1, len=len(app.config["FILES"]))
 
+
 @app.route('/next')
 def next():
     image = app.config["FILES"][app.config["HEAD"]]
     app.config["HEAD"] = app.config["HEAD"] + 1
-    with open(app.config["OUT"],'a') as f:
+    with open(app.config["OUT"], 'a') as f:
         for label in app.config["LABELS"]:
             f.write(image + "," +
-            label["id"] + "," +
-            label["name"] + "," +
-            str(round(float(label["xMin"]))) + "," +
-            str(round(float(label["xMax"]))) + "," +
-            str(round(float(label["yMin"]))) + "," +
-            str(round(float(label["yMax"]))) + "\n")
+                    label["id"] + "," +
+                    label["name"] + "," +
+                    str(round(float(label["xMin"]))) + "," +
+                    str(round(float(label["xMax"]))) + "," +
+                    str(round(float(label["yMin"]))) + "," +
+                    str(round(float(label["yMax"]))) + "\n")
     app.config["LABELS"] = []
     return redirect(url_for('tagger'))
+
 
 @app.route("/bye")
 def bye():
     return send_file("taf.gif", mimetype='image/gif')
+
 
 @app.route('/add/<id>')
 def add(id):
@@ -49,8 +53,10 @@ def add(id):
     xMax = request.args.get("xMax")
     yMin = request.args.get("yMin")
     yMax = request.args.get("yMax")
-    app.config["LABELS"].append({"id":id, "name":"", "xMin":xMin, "xMax":xMax, "yMin":yMin, "yMax":yMax})
+    app.config["LABELS"].append(
+        {"id": id, "name": "", "xMin": xMin, "xMax": xMax, "yMin": yMin, "yMax": yMax})
     return redirect(url_for('tagger'))
+
 
 @app.route('/remove/<id>')
 def remove(id):
@@ -59,6 +65,7 @@ def remove(id):
     for label in app.config["LABELS"][index:]:
         label["id"] = str(int(label["id"]) - 1)
     return redirect(url_for('tagger'))
+
 
 @app.route('/label/<id>')
 def label(id):
@@ -70,6 +77,7 @@ def label(id):
 # def prev():
 #     app.config["HEAD"] = app.config["HEAD"] - 1
 #     return redirect(url_for('tagger'))
+
 
 @app.route('/image/<f>')
 def images(f):
@@ -84,7 +92,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     directory = args.dir
     if directory[len(directory) - 1] != "/":
-         directory += "/"
+        directory += "/"
     app.config["IMAGES"] = directory
     app.config["LABELS"] = []
     files = None
@@ -101,6 +109,6 @@ if __name__ == "__main__":
     else:
         app.config["OUT"] = args.out
     print(files)
-    with open("out.csv",'w') as f:
+    with open("out.csv", 'w') as f:
         f.write("image,id,name,xMin,xMax,yMin,yMax\n")
     app.run(debug="True")
